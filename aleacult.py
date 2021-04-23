@@ -7,7 +7,6 @@ import numpy as np
 from bs4 import BeautifulSoup
 import requests
 import json
-import numpy as np
 
 #10 ans en jours
 ten_years = 10 * 365.25
