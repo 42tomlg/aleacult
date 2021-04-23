@@ -50,7 +50,7 @@ def jours2an(jour):
     return past_date.year
 
 def an2cat(an):
-    if an >= 2010:
+    if an >= 2000:
         return an
     elif an >= 1960:
         return an // 10 * 10
@@ -60,8 +60,8 @@ def an2cat(an):
 def get_xs():
     "renvoie les coordonnées en fonction du jour actuel"
     this_year=datetime.date.today().year
-    debut = [i for i in range(this_year,2009,-1)]
-    fin = [2000,1990,1980,1970,1960,1950]
+    debut = [i for i in range(this_year,1999,-1)]
+    fin = [1990,1980,1970,1960,1950]
     return debut + fin
 
 def get_xmax():
@@ -107,7 +107,9 @@ def plot_prob_cat(lambda_):
     all_points=[xmax]+xs
     widths = -np.diff(all_points)
     heights = get_probs(lambda_,xs)
+    heights_cum = np.cumsum(heights)
     plt.bar(xs,heights,widths,align='edge')
+    plt.bar(xs,heights_cum,widths,align='edge',alpha=0.5)
     plt.xlim(xmax,xmin)
     plt.show()
 
@@ -167,7 +169,16 @@ links_albums = {'2021':'https://www.senscritique.com/top/resultats/Les_meilleurs
 '2012':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_de_2012/165131',
 '2011':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_de_2011/840716',
 '2010':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_de_2010/840719',
-'2000':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_des_annees_2000/689507',
+'2009':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_de_2009/840721',
+'2008':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_de_2008/840725',
+'2007':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_de_2007/840730',
+'2006':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_de_2006/840732',
+'2005':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_de_2005/840734',
+'2004':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_de_2004/840736',
+'2003':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_de_2003/840737',
+'2002':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_de_2002/840738',
+'2001':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_de_2001/840742',
+'2000':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_de_2000/840745',
 '1990':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_des_annees_1990/689494',
 '1980':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_des_annees_1980/689488',
 '1970':'https://www.senscritique.com/top/resultats/Les_meilleurs_albums_des_annees_1970/689466',
