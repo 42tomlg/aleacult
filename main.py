@@ -1,5 +1,5 @@
 from flask import Flask
-from aleacult import *
+from aleacult import bouton_magique,give_album_link
 
 app = Flask(__name__)
 
