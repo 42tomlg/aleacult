@@ -1,5 +1,5 @@
 import scipy
-from scipy.stats import expon, boltzmann
+from scipy.stats import expon, boltzmann, truncexpon
 import math
 import datetime
 import matplotlib.pyplot as plt
@@ -20,6 +20,12 @@ def pref_lambda(p=0.5,value=10):
 def get_scale(lam):
     return 1/lam
 
+def days_from_date(day=1,month=1,year=1950):
+    delta= datetime.date.today() - datetime.date(year=year,month=month,day=day)
+    return delta.days
+
+D_max_album = days_from_date()
+
 #Fonctions de plot
 def draw_exp(p=0.5,value=10):
     fig,ax=plt.subplots(1,1)
@@ -34,8 +40,10 @@ def draw_exp(p=0.5,value=10):
 #Ecriture de la fonction principale : à partir d'un scale, on fait un tirage de jours
 # on convertir ces jours en date du passé, ce qui donne une année ce qui donne une catégorie
 
-def tirage_jours(scale):
-    return expon.rvs(scale=scale)
+def tirage_jours(lambda_,genre="albums"):
+    if genre == "albums":
+        b = D_max_album
+    return boltzmann.rvs(lambda_,N=b)
 
 def jours2an(jour):
     past_date = datetime.date.today()-datetime.timedelta(days=jour)
@@ -62,25 +70,27 @@ def get_xmax():
     year = datetime.date.today().year
     return year + yday/365.25
 
-def get_probs(scale,points):
+def get_probs(lambda_,points):
     """
     scale est le paramètre de la loi exponentielle
     points est une liste de points sur lesquels évaluer les proba
     """
     today=datetime.date.today()
+    N=D_max_album
     x = [0.]
     for years in points[:-1]:
         day = datetime.date(years,1,1)
         delta_day=(today-day).days
         x.append(delta_day)
-    rv = expon(scale=scale)
+    rv = boltzmann(lambda_,N)
     max_ = rv.ppf(0.999)
     x.append(max_)
     probs = np.diff(rv.cdf(x))
     return probs
 
-def get_xmin(scale):
-    rv = expon(scale=scale)
+def get_xmin(lambda_):
+    N = D_max_album
+    rv = boltzmann(lambda_=lambda_,N=N)
     #on obtient donc un nombre de jours
     max_ = rv.ppf(0.999)
     max_year = (datetime.date.today()-datetime.timedelta(max_)).year
@@ -91,19 +101,20 @@ def plot_prob_cat(lambda_):
     """
     dessine un graphique en fonction de scale en bar chart en fonction des catégories
     """
-    scale = 1/lambda_
-    xmin = get_xmin(scale)
+    xmin = get_xmin(lambda_)
     xs = get_xs()
     xmax = get_xmax()
     all_points=[xmax]+xs
     widths = -np.diff(all_points)
-    heights = get_probs(scale,xs)
+    heights = get_probs(lambda_,xs)
     plt.bar(xs,heights,widths,align='edge')
     plt.xlim(xmax,xmin)
     plt.show()
 
 def plot_pref(p=0.5,value=10):
-    lambda_ = pref_lambda(p,value)
+    N1 = days_from_date()
+    perc = 100 * value * 365.25 / N1
+    lambda_ = pref_lambda_boltzmann(p,perc,N1)
     plot_prob_cat(lambda_)
 # Ecriture des fonctions pour le choix du classement
 #D'abord une fonction pour définir la préférence
@@ -134,7 +145,9 @@ def bouton_magique(p1=0.5,v1=10,p2=0.5,v2=20):
     p2 : percentile pour le tirage du classement
     v2 : valeur pour le tirage du classement
     """
-    categorie = an2cat(jours2an(tirage_jours(1/pref_lambda(p1,v1))))
+    N1 = days_from_date()
+    perc = 100 * v1 * 365.25 / N1
+    categorie = an2cat(jours2an(tirage_jours(pref_lambda_boltzmann(p1,perc,N1))))
     N = N_from_cat(categorie)
     classement = tirage_classement(pref_lambda_boltzmann(p2,v2,N),N)
     return categorie , classement
