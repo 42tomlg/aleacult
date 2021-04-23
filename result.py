@@ -1,4 +1,4 @@
-from aleacult import *
+from aleacult import bouton_magique,give_album_link
 
 if __name__ == "__main__":
     year, classement = bouton_magique()
